@@ -1,0 +1,61 @@
+
+
+az provider register --namespace Microsoft.Kubernetes
+az provider register --namespace Microsoft.KubernetesConfiguration
+az provider register --namespace Microsoft.ExtendedLocation
+
+
+az login
+az account set --subscription e9b9c71e-d2ba-4086-a5ed-2923e15962d9
+az account show -o table
+
+
+az aks create -g kubernetes -n magaks001 --enable-managed-identity --node-count 3 --enable-addons monitoring --enable-msi-auth-for-monitoring  --generate-ssh-keys -l eastus --node-vm-size Standard_E4ds_v4
+
+
+az aks get-credentials --resource-group kubernetes --name magaks001
+
+
+az extension add --name k8s-extension
+
+
+
+az k8s-extension create --name azureml --extension-type Microsoft.AzureML.Kubernetes --config enableTraining=True enableInference=True inferenceRouterServiceType=LoadBalancer allowInsecureConnections=True inferenceRouterHA=True internalLoadBalancerProvider=azure --cluster-type managedClusters --cluster-name magaks001 --resource-group kubernetes --scope cluster
+
+
+## updated command after first seems to fail to create public ips
+az k8s-extension create --name azureml --extension-type Microsoft.AzureML.Kubernetes --config enableTraining=True enableInference=True inferenceRouterServiceType=LoadBalancer allowInsecureConnections=True inferenceRouterHA=False  --cluster-type managedClusters --cluster-name magaks001 --resource-group kubernetes --scope cluster
+
+
+
+read input from user and include in the payload as a topic
+
+
+
+verify aml extension
+
+az k8s-extension show --name azureml --cluster-type managedClusters --cluster-name magaks001 --resource-group kubernetes
+
+
+kubectl get pods -n azureml
+
+
+https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-kubernetes-extension?view=azureml-api-2&tabs=deploy-extension-with-cli#prerequisites
+
+PS C:\git\aks> az --version
+azure-cli                         2.38.0 *
+
+core                              2.38.0 *
+telemetry                          1.0.6 *
+
+Extensions:
+connectedk8s                      1.2.10
+k8s-extension                      1.4.3
+ml                                2.22.0
+
+Dependencies:
+msal                            1.18.0b1
+azure-mgmt-resource             21.1.0b1
+
+Python location 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\python.exe'
+Extensions directory 'C:\Users\mutaza\.azure\cliextensions'
